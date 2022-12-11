@@ -1,0 +1,123 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Programma per la verifica delle congetture di Beal, Collatz e Cramer}
+\date{Sessione invernale 2022/23}
+\author{Milena Balducci \\ Matricola 321791}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section{Specifica del problema}
+La congettura di Beal asserisce che se $a^x + b^y = c^z$ dove $a,b,c,x,y,z, \in \mathbb{N}$ con $a,b,c\ge1$ e $x,y,z\ge3$, allora $a,b,c$ hanno un fattore primo in comune. 
+La congettura di Collatz asserisce che la funzione $f:\mathbb{N}_{>0}\longrightarrow\mathbb{N}_{>0}$ definita ponendo $f(n) = n/2$ se $n$ è pari e $f(n) = 3 * n + 1$ 
+se $n$ è dispari genera 1 dopo un numero finito di applicazioni ai numeri mano a mano ottenuti. 
+La congettura di Cramer asserisce che il valore assoluto della differenza tra due numeri primi consecutivi è minore del quadrato del logaritmo naturale del più piccolo dei due numeri. 
+Scrivere un programma ANSI C che chieda all'utente quale congettura intende considerare e poi la verifica acquisendo dalla tastiera $a,b,c,x,y,z$ nel primo caso 
+(se non vale  $a^x + b^y = c^z$, il programma lo stampa sullo schermo e poi verifica comunque se $a,b,c$ hanno un fattore primo in comune e ne stampa l'esito 
+sullo schermo), $n>0$ nel secondo caso (il programma stampa sullo schermo tutti i numeri generati), 
+due numeri primi consecutivi nel terzo caso (il programma stampa sullo schermo sia il valore assoluto della differenza tra i due numeri che il quadrato del 
+logaritmo naturale del più piccolo dei due numeri). 
+
+\newpage
+
+\section{Analisi del Problema}
+\subsection{Dati di Ingresso del Problema}
+I dati di ingresso sono l'operazione scelta dall'utente e, a seconda della scelta effettuata:
+
+\begin{itemize}
+\item tre potenze con base intera $b\ge1$ e esponente intero $e\ge3$;
+\item un numero intero n$>0$;
+\item due numeri primi $n_1$ e $n_2$ consecutivi.
+\end{itemize}
+
+
+\subsection{Dati di uscita del Problema}
+I dati di uscita del problema sono l'esito della verifica della congettura in esame e, in base all'operazione scelta dall'utente:
+
+\begin{itemize}
+\item l'insieme dei fattori primi comuni alle tre basi scelte; 
+\item l'insieme dei valori generati dalle applicazioni successive della funzione $f:\mathbb{N}_{>0}\longrightarrow\mathbb{N}_{>0}$; 
+\item il valore assoluto della differenza tra i due numeri primi inseriti, e il quadrato del logaritmo naturale del minore dei due. 
+\end{itemize}
+
+\subsection{Relazioni intercorrenti tra i dati del Problema}
+I fattori primi di un numero $x \in \mathbb{N}$ sono tutti i numeri primi $n \in \mathcal{P}:={n \in \mathbb{N}:n=n*1}$ che lo dividono esattamente (ovvero senza resto).
+L'insieme $F(x)$ dei fattori primi di un numero $x$ sono definibili a partire da $n=2$ nel seguente modo:
+\begin{itemize}
+    \item Se x/n \in \mathbb{N}, $n \in F(x)$;
+    \item Se x/n \notin \mathbb{N}, $n = n+1$.
+\end{itemize}  
+
+La congettura di Collatz consiste nell'applicare la funzione $f:\mathbb{N}_{>0}\longrightarrow\mathbb{N}_{>0}$ al risultato della precedente applicazione, ottenendo così
+un insieme di numeri ${n_0, n_1,....n_{k-1}, n_k}$, con $n_k = 1$ come indicato nella specifica del problema. 
+E' possibile implementare ricorsivamente questa funzione distinguendo due casi:
+\being{itemize}
+\item Caso base: $k = 0 \Rightarrow n_0 = n$
+\item Caso generale: $k > 0 \Rightarrow n_k = f(n_{k-1})$, 
+\end{itemize}
+dove $f(n)=\begin{cases} n/2, & \mbox{se }n\mbox{ pari} \\ 3n+1, & \mbox{se }n\mbox{ dispari}\end{cases}$
+
+\newpage
+
+
+\section{Progettazione dell'Algoritmo}
+
+\subsection{Scelte di progetto}
+Il numero di dati di input del problema varia a seconda dell'operazione scelta dall'utente. Per questo motivo, onde evitare di dichiarare variabili in eccesso che
+non verrebbero utilizzate, è utile impostare i valori di input come una array di valori numerici, la cui dimensione viene allocata dinamicamente in base all'operazione
+scelta dall'utente.
+
+La congettura di Collatz si presta naturalmente ad essere implementata tramite una funzione ricorsiva, che ha come condizione di terminazione $n_k = 1$, con $k\ne0$.
+I numeri ottenuti dall'esecuzione della funzione vengono allocati in una array dinamica, la cui dimensione viene calcolata contestualmente all'esecuzione della funzione.
+
+Per evitare ridondanze di codice, si decide di sviluppare dei sottoprogrammi per effettuare operazioni che vengono ripetute numerose volte all'interno dell'algoritmo, come
+la verifica dell'appartenenza di un numero all'insieme dei numeri primi, la scomposizione in fattori primi o l'acquisizione e validazione stretta degli input.
+
+
+\subsection{Passi dell'algoritmo}
+I passi dell'algoritmo per risolvere il problema sono i seguenti:
+
+\begin{itemize}
+\item Acquisire l'operazione scelta dall'utente.
+\item In base alla scelta effettuata:
+    \begin{itemize}
+    \item Allocare la dimensione dell'array, che conterrà sei elementi (tre basi, tre esponenti);
+    \item Acquisire le tre potenze $a^x, b^y, c^z$;
+    \item Verificare se la relazione $a^x + b^y = c^z$ è valida per $a,b,c,x,y,z$:
+        \begin{itemize}
+        \item Se la relazione vale per i tre valori acquisiti, cercare i fattori primi comuni;
+        \item Se la relazione non vale per i tre valori acquisiti, verificare se sono comunque presenti fattori primi comuni. 
+        \end{itemize}
+    \item Stampare a schermo gli eventuali fattori primi individuati.
+    \end{itemize}
+
+    \item oppure:
+
+    \begin{itemize}
+    \item Allocare la dimensione dell'array, che conterrà un solo elemento;
+    \item Acquisire il valore intero maggiore di zero;
+    \item Assegnare il valore come parametro alla funzione ricorsiva;
+    \item Stampare la sequenza di valori ottenuti;
+    
+    \end{itemize}
+
+    \item oppure:
+    \begin{itemize}
+        \item Allocare la dimensione dell'array, che conterrà due elementi;
+        \item Acquisire e validare i due numeri primi consecutivi;
+        \item Calcolare la differenza dei due numeri, e trasformarla in valore assoluto;
+        \item Verificare quale dei due numeri acquisiti è il minore;
+        \item Calcolare la potenza quadrata del logaritmo naturale del numero minore;
+        \item Verificare se il valore assoluto della differenza è minore di $(ln(min(p_n, p_{n+1})))^2$;
+        \item Stampare i due valori ottenuti;
+    \end{itemize}
+
+    \item Stampare l'esito della verifica.
+\end{itemize}
+
+
+\end{document}
