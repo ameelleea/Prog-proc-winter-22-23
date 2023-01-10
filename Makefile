@@ -1,7 +1,7 @@
 #Makefile del programma per verificare le congetture di Beal, Collatz e Cramer.
 
 verifica_congetture: verifica_congetture.c Makefile
-	gcc -ansi -Wall -O verifica_congetture.c -o verifica_congetture
+	gcc -ansi -Wall -O verifica_congetture.c -o verifica_congetture -lm
 
 pulisci:
 	rm -f verifica_congetture.o
